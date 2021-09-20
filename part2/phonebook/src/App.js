@@ -1,76 +1,70 @@
-import React, { useEffect, useState } from 'react'
-import backend from './backend.js';
+import React, { useEffect, useState } from 'react';
+import backend from './backend';
 import './App.css';
 
 const Error = ({ message }) => {
     if (message === null) {
-        return null
+        return null;
     }
-  
+
     return (
         <div className="error">
             {message}
-        </div>
-    )
-}
+      </div>
+    );
+};
 
 const Notification = ({ message }) => {
     if (message === null) {
-        return null
+        return null;
     }
-  
+
     return (
         <div className="notification">
             {message}
-        </div>
-    )
-}
+      </div>
+    );
+};
 
-const DisplayPerson = ({ person, onDeletePerson }) =>
-{
-    return (
-        <div>
-            {person.name}  {person.number} <button onClick={() => onDeletePerson(person)}>delete</button>
-        </div>
-    )
-}
+const DisplayPerson = ({ person, onDeletePerson }) => (
+  <div>
+      {person.name}
+      {' '}
+      {person.number}
+      {' '}
+      <button onClick={() => onDeletePerson(person)}>delete</button>
+    </div>
+);
 
-const DisplayPhoneBook = ({ shownPeople, onDeletePerson }) => 
-{
-    return (
-        <div>
-            {shownPeople.map(person => <DisplayPerson person={person} key={person.id} onDeletePerson={onDeletePerson} />)}
-        </div>
-    )
-}
+const DisplayPhoneBook = ({ shownPeople, onDeletePerson }) => (
+  <div>
+      {shownPeople.map((person) => <DisplayPerson person={person} key={person.id} onDeletePerson={onDeletePerson} />)}
+    </div>
+);
 
-const Filter = ({ filterName, onFilterNameChange }) => 
-{
-    return (
-        <div>
-            filter names <input value={filterName} onChange={onFilterNameChange} />
-        </div>
-    )
-}
+const Filter = ({ filterName, onFilterNameChange }) => (
+  <div>
+      filter names <input value={filterName} onChange={onFilterNameChange} />
+    </div>
+);
 
-const PhonebookForm = ({ newName, onNameChange, newNumber, onNumberChange, onAddName }) => 
-{
-    return (
-        <div>
-            <form onSubmit={onAddName}>
-                <div>
-                    name: <input value={newName} onChange={onNameChange} />
-                </div>
-                <div>
-                    number: <input type="tel" value={newNumber} onChange={onNumberChange} />
-                </div>
-                <div>
-                    <button type="submit">add</button>
-                </div>
-            </form>
-        </div>
-    )
-}
+const PhonebookForm = ({
+    newName, onNameChange, newNumber, onNumberChange, onAddName
+}) => (
+  <div>
+      <form onSubmit={onAddName}>
+          <div>
+              name: <input value={newName} onChange={onNameChange} />
+            </div>
+          <div>
+              number: <input type="tel" value={newNumber} onChange={onNumberChange} />
+            </div>
+          <div>
+              <button type="submit">add</button>
+            </div>
+        </form>
+    </div>
+);
 
 const App = () => {
     const [persons, setPersons] = useState([]);
@@ -83,17 +77,15 @@ const App = () => {
     const [errorTimeout, setErrorTimeout] = useState(null);
 
     useEffect(() => {
-        backend.getAll().then(persons => {
+        backend.getAll().then((persons) => {
             setPersons(persons);
         });
     }, []);
 
-    function addError(message)
-    {
+    function addError(message) {
         setNewErrorMessage(message);
 
-        if (errorTimeout !== null) 
-        {
+        if (errorTimeout !== null) {
             clearTimeout(errorTimeout);
             setErrorTimeout(null);
         }
@@ -104,12 +96,10 @@ const App = () => {
         }, 3000));
     }
 
-    function addNotification(message)
-    {
+    function addNotification(message) {
         setNotification(message);
 
-        if (notificationTimeout !== null) 
-        {
+        if (notificationTimeout !== null) {
             clearTimeout(notificationTimeout);
             setNotificationTimeout(null);
         }
@@ -120,93 +110,88 @@ const App = () => {
         }, 3000));
     }
 
-    function onAddName(event)
-    {
+    function onAddName(event) {
         event.preventDefault();
 
         const person = {
             name: newName,
             number: newNumber
         };
-        const foundPerson = persons.find(p => p.name === person.name);
+        const foundPerson = persons.find((p) => p.name === person.name);
 
-        if (foundPerson !== undefined)
-        {
-            const newPerson = {...foundPerson, number: newNumber};
-            backend.update(foundPerson.id, newPerson).then(newPerson => {
-                setPersons(persons.map(p => p.id === newPerson.id ? newPerson : p));
+        if (foundPerson !== undefined) {
+            const newPerson = { ...foundPerson, number: newNumber };
+            backend.update(foundPerson.id, newPerson).then((newPerson) => {
+                setPersons(persons.map((p) => (p.id === newPerson.id ? newPerson : p)));
                 addNotification(`Successfully updated ${newPerson.name}!`);
+
+                setNewName('');
+                setNewNumber('');
             })
-            .catch(error => {
-                addError(`Error while updating info of ${person.name}`);
-            });
-        }
-        else
-        {
-            backend.create(person).then(newPerson => {
+                .catch((error) => {
+                    addError(`Error while updating info of ${person.name}! ${error.response.data.error}`);
+                });
+        } else {
+            backend.create(person).then((newPerson) => {
                 setPersons(persons.concat(newPerson));
                 addNotification(`Successfully added ${newPerson.name}!`);
-            })
-            .catch(error => {
-                addError(`Error while adding ${person.name}!`);
-            });
-        }
 
-        setNewName('');
-        setNewNumber('');
+                setNewName('');
+                setNewNumber('');
+            })
+                .catch((error) => {
+                    addError(`Error while adding ${person.name}! ${error.response.data.error}`);
+                });
+        }
     }
 
-    function onDeletePerson(person)
-    {
-        if (window.confirm(`Delete ${person.name}?`))
-        {
-            backend.del(person.id).then(result => {
-                setPersons(persons.filter(p => p.id !== person.id));
+    function onDeletePerson(person) {
+        if (window.confirm(`Delete ${person.name}?`)) {
+            backend.del(person.id).then((result) => {
+                setPersons(persons.filter((p) => p.id !== person.id));
                 addNotification(`Successfully deleted ${person.name}!`);
             })
-            .catch(error => {
-                setPersons(persons.filter(p => p.id !== person.id));
-                addError(`Cannot delete ${person.name}, it's probably already deleted!`);
-            });
+                .catch((error) => {
+                    setPersons(persons.filter((p) => p.id !== person.id));
+                    addError(`Cannot delete ${person.name}, it's probably already deleted! ${error.response.data.error}`);
+                });
         }
     }
-    
-    function onFilterNameChange(event)
-    {
+
+    function onFilterNameChange(event) {
         setNewFilterName(event.target.value);
     }
-    
-    function onNameChange(event)
-    {
+
+    function onNameChange(event) {
         setNewName(event.target.value);
     }
 
-    function onNumberChange(event)
-    {
+    function onNumberChange(event) {
         setNewNumber(event.target.value);
     }
 
-    const shownPeople = 
-        filterName === '' ? 
-        persons : 
-        persons.filter(person => person.name.toLowerCase().includes(filterName.toLowerCase()));
+    const shownPeople = filterName === ''
+        ? persons
+        : persons.filter((person) => person.name.toLowerCase().includes(filterName.toLowerCase()));
 
     return (
         <div>
             <Error message={errorMessage} />
             <Notification message={notification} />
             <h2>Phonebook</h2>
-            <PhonebookForm newName={newName} onNameChange={onNameChange} 
-                           newNumber={newNumber} onNumberChange={onNumberChange} 
-                           onAddName={onAddName} />
+            <PhonebookForm
+            newName={newName} onNameChange={onNameChange}
+            newNumber={newNumber} onNumberChange={onNumberChange}
+            onAddName={onAddName}
+          />
 
             <Filter filterName={filterName} onFilterNameChange={onFilterNameChange} />
 
             <h2>Numbers</h2>
 
             <DisplayPhoneBook shownPeople={shownPeople} onDeletePerson={onDeletePerson} />
-        </div>
-    )
-}
+      </div>
+    );
+};
 
-export default App
+export default App;
