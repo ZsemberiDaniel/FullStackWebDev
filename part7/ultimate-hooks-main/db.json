@@ -1,0 +1,57 @@
+{
+  "notes": [
+    {
+      "content": "custom-hooks are grat",
+      "id": 1
+    },
+    {
+      "content": "the best featrure ever <3",
+      "id": 2
+    },
+    {
+      "content": "appla",
+      "id": 3
+    },
+    {
+      "content": "appla",
+      "id": 4
+    },
+    {
+      "content": "appla",
+      "id": 5
+    },
+    {
+      "content": "englantia",
+      "id": 6
+    },
+    {
+      "content": "1",
+      "id": 7
+    },
+    {
+      "content": "apple",
+      "id": 8
+    },
+    {
+      "content": "132123321",
+      "id": 9
+    }
+  ],
+  "persons": [
+    {
+      "name": "mluukkai",
+      "number": "040-5483923",
+      "id": 1
+    },
+    {
+      "name": "kaltsoon",
+      "number": "045-2323456",
+      "id": 2
+    },
+    {
+      "name": "Dan",
+      "number": "213123213123",
+      "id": 3
+    }
+  ]
+}
